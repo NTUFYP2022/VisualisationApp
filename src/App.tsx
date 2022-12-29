@@ -1,16 +1,28 @@
 import * as THREE from 'three'
-import React, {useRef, useState} from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import {Canvas, ThreeElements, useFrame, useThree} from "@react-three/fiber";
+import {Canvas, ThreeElements, useFrame, useLoader} from "@react-three/fiber";
 import {OrbitControls} from "@react-three/drei";
+import {TextureLoader} from 'three/src/loaders/TextureLoader'
+
 
 function WallPlane(props: ThreeElements['mesh']) {
 
     return (
         <mesh {...props}>
-            <planeGeometry args={[4, 4]}/>
-            <meshStandardMaterial color={'hotpink'}/>
+            <boxGeometry args={[20, 4, 1]}/>
+            <meshStandardMaterial color={'grey'}/>
+        </mesh>
+    );
+}
+
+function FloorPlane(props: ThreeElements['mesh']) {
+    const colorMap = useLoader(TextureLoader, 'grid_texture.png')
+
+    return (
+        <mesh {...props}>
+            <boxGeometry args={[20, 20, 1]}/>
+            <meshStandardMaterial map={colorMap}/>
         </mesh>
     );
 }
@@ -39,18 +51,33 @@ function deg2rad(number: number) {
 }
 
 function App() {
+    const [coordinates, setCoordinates] = useState([0, 0, 0])
+    useEffect(() => {
+        const interval = setInterval(() => setCoordinates(Array.from({length: 3}, (element, index) => {
+            if (index ===1)
+                return 0;
+            else
+                return Math.floor(Math.random() * 5)
+        })), 1000);
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
     return (
-        <div className="App"  style={{ width: "100vw", height: "100vh" }}>
-                <Canvas style={{backgroundColor:"pink"}} camera={{position: [0, 0, 5], rotation:[0,2,0]}}>
-                    <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
-                    <ambientLight/>
-                    <pointLight position={[10, 10, 10]}/>
-                    <Box position={[-1.2, 0, 0]}/>
-                    <Box position={[1.2, 0, 0]}/>
-                    <WallPlane position={[-2, 0,-2]} rotation={[0,3.14/4,0]}/>
-                    <WallPlane position={[4, 0,-2]} rotation={[0,3.14/4,0]}/>
-                    <WallPlane position={[1 , 0,-4]} rotation={[0,0 ,0]}/>
-                </Canvas>
+        <div className="App" style={{width: "100vw", height: "100vh"}}>
+            <div>Real-time coordinates: {coordinates.toString()}</div>
+            <Canvas style={{backgroundColor: "pink"}} camera={{position: [0, 0, 5], rotation: [0, 2, 0]}}>
+                <OrbitControls enablePan={true} enableZoom={true} enableRotate={true}/>
+                <ambientLight/>
+                <pointLight position={[10, 10, 10]}/>
+                {/*@ts-ignore*/}
+                <Box position={coordinates}/>
+                <WallPlane position={[-10, 0, 6]} rotation={[0, 3.14 / 2, 0]}/>
+                <WallPlane position={[10, 0, 6]} rotation={[0, 3.14 / 2, 0]}/>
+                <WallPlane position={[0, 0, -4]} rotation={[0, 0, 0]}/>
+                <FloorPlane position={[0, -2, 6]} rotation={[3.14 / 2, 0, 0]}/>
+
+            </Canvas>
         </div>
     );
 }
