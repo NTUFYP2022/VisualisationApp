@@ -313,14 +313,19 @@ function App() {
 
             </div>
             <div style={{width: "100vw", height: "93vh", display: 'flex'}}>
-                <div style={{width: '40%', overflowWrap: 'break-word',}}>
+                <div style={{width: '35%', overflowWrap: 'break-word',}}>
                     <DataGrid rows={firebaseFlag ? fbCoordList : coordList} columns={columns}
                               components={{Toolbar: GridToolbar}}/>
                 </div>
 
                 <div style={{flexGrow: 1}}>
-                    <Canvas style={{backgroundColor: "pink"}} camera={{position: [0, 18, 15]}}>
-                    <OrbitControls enablePan={true} enableZoom={true} enableRotate={true}/>
+                    <Canvas style={{backgroundColor: "pink"}} camera={{position: [0, 12, 7]}}>
+                    <OrbitControls enablePan={false} enableZoom={false} enableRotate={true}
+                                   minAzimuthAngle={-Math.PI / 8}
+                                   maxAzimuthAngle={Math.PI / 8}
+                                   minPolarAngle={0.45}
+                                   maxPolarAngle={0.8}
+                                   target={[3.5 , 0, 4]}/>
                     <ambientLight/>
                     <pointLight position={[10, 10, 10]}/>
                     {/*@ts-ignore*/}
