@@ -37,33 +37,40 @@ function WallPlane(props: ThreeElements['mesh']) {
 
     return (
         <mesh {...props}>
-            <boxGeometry args={[20, 4, 1]}/>
+            <boxGeometry args={[11, 4, 1]}/>
             <meshStandardMaterial color={'hotpink'}/>
         </mesh>
     );
 }
 
 function FloorPlane(props: ThreeElements['mesh']) {
-    const colorMap = useLoader(TextureLoader, 'grid_texture.png')
+    const rows = [];
+    for (let i = 0; i < 64; i++) {
+        rows.push(
+            <mesh position={[i%8,-0.5,-Math.floor(i/8)]}>
+                <boxGeometry args={[0.9, 0.05, 0.9]}/>
+            </mesh>
+        );
+    }
 
     return (
-        <mesh {...props}>
-            <boxGeometry args={[20, 20, 1]}/>
-            <meshStandardMaterial map={colorMap}/>
-        </mesh>
+        //@ts-ignore
+        <Suspense>
+            {rows}
+        </Suspense>
     );
 }
 
 const Box = ({x, y, z}: THREE.Vector3) => {
     const ref = useRef<THREE.Mesh>(null!)
-    const vec = new THREE.Vector3(x, y, z);
+    const vec = new THREE.Vector3(x, y, -z);
     const [hovered, hover] = useState(false)
     const [clicked, click] = useState(false)
     const [waitFlag, setWaitFlag] = useState(false)
     useEffect(() => {
         setWaitFlag(true)
     }, [])
-    useFrame((state, delta) => (ref.current.position.lerp(vec, 0.1)))
+    useFrame((state, delta) => (ref.current.position.lerp(vec, 0.1*(x**2+z**2)**0.5)))
 
     // @ts-ignore
     return (
@@ -306,13 +313,13 @@ function App() {
 
             </div>
             <div style={{width: "100vw", height: "93vh", display: 'flex'}}>
-                <div style={{width: '50%', overflowWrap: 'break-word',}}>
+                <div style={{width: '40%', overflowWrap: 'break-word',}}>
                     <DataGrid rows={firebaseFlag ? fbCoordList : coordList} columns={columns}
                               components={{Toolbar: GridToolbar}}/>
                 </div>
 
-                <div style={{flexGrow: 1}}><Canvas style={{backgroundColor: "pink"}}
-                                                   camera={{position: [15, 10, 5], rotation: [1, 1, 1]}}>
+                <div style={{flexGrow: 1}}>
+                    <Canvas style={{backgroundColor: "pink"}} camera={{position: [0, 18, 15]}}>
                     <OrbitControls enablePan={true} enableZoom={true} enableRotate={true}/>
                     <ambientLight/>
                     <pointLight position={[10, 10, 10]}/>
@@ -320,10 +327,10 @@ function App() {
                     <Box x={firebaseFlag ? fbCoords[0] : coordinates[0]} y={firebaseFlag ? fbCoords[1] : coordinates[1]}
                          z={firebaseFlag ? fbCoords[2] : coordinates[2]}/>
                     {/*<PawPrintModel coordinates={firebaseFlag?fbCoordList[1] : coordList[1] } text={'1'}/>*/}
-                    <WallPlane position={[-10.5, 0, 6]} rotation={[0, 3.14 / 2, 0]}/>
-                    <WallPlane position={[10.5, 0, 6]} rotation={[0, 3.14 / 2, 0]}/>
-                    <WallPlane position={[0, 0, -4.5]} rotation={[0, 0, 0]}/>
-                    <FloorPlane position={[0, -2.5, 6]} rotation={[3.14 / 2, 0, 0]}/>
+                    <WallPlane position={[-2, 0, -4]} rotation={[0, 3.14 / 2, 0]}/>
+                    <WallPlane position={[9, 0, -4]} rotation={[0, 3.14 / 2, 0]}/>
+                    <WallPlane position={[3.5, 0, -9]} rotation={[0, 0, 0]}/>
+                    <FloorPlane position={[-2.5, -2.5, 6]} rotation={[0, 0, 0]}/>
                 </Canvas></div>
 
             </div>
