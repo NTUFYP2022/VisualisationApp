@@ -15,14 +15,12 @@ import '@fontsource/roboto/700.css';
 import {Button, Typography} from "@mui/material";
 import {off, onChildAdded, ref, update} from "firebase/database";
 import {fbDatabase} from "./firebaseApp";
+import {io} from "socket.io-client";
 
 
+const socket = io('http://192.168.72.148:5000')
 const rows: GridRowsProp = [
     {id: 1, x: 0, y: 0, z: 0, time: new Date().toLocaleString(), timestamp: Date.now()},
-    {id: 2, x: 0, y: 0, z: 0, time: new Date().toLocaleString(), timestamp: Date.now()},
-    {id: 3, x: 0, y: 0, z: 0, time: new Date().toLocaleString(), timestamp: Date.now()},
-    {id: 4, x: 0, y: 0, z: 0, time: new Date().toLocaleString(), timestamp: Date.now()},
-    {id: 5, x: 0, y: 0, z: 0, time: new Date().toLocaleString(), timestamp: Date.now()},
 
 ];
 const columns: GridColDef[] = [
@@ -206,7 +204,8 @@ const PawPrintModel2 = ({coordinates, text}) => {
 function App() {
     const [coordinates, setCoordinates] = useState([0, 0, 0])
     const [coordList, setCoordList] = useState(rows)
-    const [pauseFlag, setPauseFlag] = useState(false)
+    const [pauseFlag, setPauseFlag] = useState(true)
+    const [isConnected, setIsConnected] = useState(socket.connected)
     const [fbCoords, setFBCoords] = useState([0, 0, 0])
     const [fbCoordList, setFBCoordList] = useState(rows)
 
@@ -237,6 +236,39 @@ function App() {
         setCoordList(rows);
         setCoordinates([0, 0, 0])
     }
+
+    useEffect(() => {
+        socket.on('connect', () => {
+            setIsConnected(true);
+            console.log('connected!')
+        });
+
+        socket.on('disconnect', () => {
+            setIsConnected(false);
+        });
+
+        socket.on('Predicted', (data) => {
+            console.log(JSON.parse(data))
+            const parsed_data= JSON.parse(data)
+            const newArr = [parsed_data['X'],parsed_data['Y'],parsed_data['Z']]
+            const newRow = {
+                x: newArr[0],
+                y: newArr[1],
+                z: newArr[2],
+                timestamp: Date.now(),
+                time: new Date().toLocaleString(),
+                id: Math.random().toString(16).slice(2)
+            }
+            setCoordinates(newArr)
+            setCoordList(oldArr => [newRow, ...oldArr]);
+        });
+
+        return () => {
+            socket.off('connect');
+            socket.off('disconnect');
+            socket.off('Predicted');
+        };
+    }, []);
 
     useEffect(() => {
         const mockRef = ref(fbDatabase, `/mock/mockData`);
