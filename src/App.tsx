@@ -83,9 +83,9 @@ const Box = ({x, y, z}: THREE.Vector3) => {
                 {/*{waitFlag && <ChowChowModel/>}*/}
                 {waitFlag && <boxGeometry args={[1, 1, 1]} />}
                 {/* @ts-ignore*/}
-                <Text3D font={'helvetiker_bold.typeface.json'} position={[-1, 1, 0]} bevelEnabled bevelSize={0.05}>
+                <Text3D font={'helvetiker_bold.typeface.json'} position={[-1, 1, 0]} bevelEnabled bevelSize={0.04} rotation={[-0.75,0,0]}>
                     {x},{z}
-                    <meshStandardMaterial color='#d1924e'/>
+                    <meshStandardMaterial color='#1182fe'/>
                 </Text3D>
             </mesh>
         </Suspense>
@@ -247,7 +247,7 @@ function App() {
             setIsConnected(false);
         });
 
-        socket.on('Predicted', (data) => {
+        socket.on('Predicted', (data: any) => {
             console.log(JSON.parse(data))
             const parsed_data= JSON.parse(data)
             const newArr = [parsed_data['X'],parsed_data['Y'],parsed_data['Z']]
@@ -351,13 +351,13 @@ function App() {
                 </div>
 
                 <div style={{flexGrow: 1}}>
-                    <Canvas style={{backgroundColor: "pink"}} camera={{position: [0, 12, 7]}}>
+                    <Canvas style={{backgroundColor: "grey"}} camera={{position: [4, 10, -10]}}>
                     <OrbitControls enablePan={false} enableZoom={false} enableRotate={true}
                                    minAzimuthAngle={-Math.PI / 8}
                                    maxAzimuthAngle={Math.PI / 8}
-                                   minPolarAngle={0.45}
-                                   maxPolarAngle={0.8}
-                                   target={[3.5 , 0, 4]}/>
+                                   minPolarAngle={0.35}
+                                   maxPolarAngle={0.7}
+                                   target={[4 , 0, -3]}/>
                     <ambientLight/>
                     <pointLight position={[10, 10, 10]}/>
                     {/*@ts-ignore*/}
