@@ -18,7 +18,7 @@ import {fbDatabase} from "./firebaseApp";
 import {io} from "socket.io-client";
 
 
-const socket = io('http://192.168.72.148:5000')
+const socket = io('http://192.168.43.242:5000')
 const rows: GridRowsProp = [
     {id: 1, x: 0, y: 0, z: 0, time: new Date().toLocaleString(), timestamp: Date.now()},
 
@@ -83,7 +83,7 @@ const Box = ({x, y, z}: THREE.Vector3) => {
                 {/*{waitFlag && <ChowChowModel/>}*/}
                 {waitFlag && <boxGeometry args={[1, 1, 1]} />}
                 {/* @ts-ignore*/}
-                <Text3D font={'helvetiker_bold.typeface.json'} position={[-1, 1, 0]} bevelEnabled bevelSize={0.04} rotation={[-0.75,0,0]}>
+                <Text3D font={'helvetiker_bold.typeface.json'} position={[-1, 1, 0]} bevelEnabled bevelSize={0.02} rotation={[-0.75,0,0]}>
                     {x},{z}
                     <meshStandardMaterial color='#1182fe'/>
                 </Text3D>
@@ -351,13 +351,14 @@ function App() {
                 </div>
 
                 <div style={{flexGrow: 1}}>
-                    <Canvas style={{backgroundColor: "grey"}} camera={{position: [4, 10, -10]}}>
+                    <Canvas style={{backgroundColor: "grey"}} camera={{position: [3.5, 10, -10]}}>
+                        {/*@ts-ignore*/}
                     <OrbitControls enablePan={false} enableZoom={false} enableRotate={true}
                                    minAzimuthAngle={-Math.PI / 8}
                                    maxAzimuthAngle={Math.PI / 8}
-                                   minPolarAngle={0.35}
+                                   minPolarAngle={0}
                                    maxPolarAngle={0.7}
-                                   target={[4 , 0, -3]}/>
+                                   target={[3.5 , 0, -3]}/>
                     <ambientLight/>
                     <pointLight position={[10, 10, 10]}/>
                     {/*@ts-ignore*/}
